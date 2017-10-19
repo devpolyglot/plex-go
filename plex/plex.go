@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/lorac/plex-go/model"
+	"github.com/Lorac/plex-go/model"
 )
 
 const (

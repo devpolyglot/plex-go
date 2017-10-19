@@ -6,7 +6,7 @@ import (
 	"os"
 	"syscall"
 
-	"github.com/lorac/plex-go/plex"
+	"github.com/Lorac/plex-go/plex"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

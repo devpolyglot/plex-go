@@ -8,10 +8,17 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/lorac/plex-go/model"
 )
 
 const (
-	defaultBaseURL = " http://127.0.0.1:32400"
+	defaultBaseURL        = "http://127.0.0.1:32400/"
+	plexURL               = "https://plex.tv/"
+	XPlexProduct          = "plex-go"
+	XPlexVersion          = "0.0.1"
+	XPlexClientIdentifier = "plex-go-client-id"
+	signInURL             = plexURL + "users/sign_in.json"
 )
 
 type Client struct {
@@ -31,6 +38,26 @@ func NewClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL}
 	return c
+}
+
+func RequestPlexToken(username, password string, httpClient *http.Client) (string, error) {
+	var signInResponse model.SignInResponse
+
+	form := url.Values{}
+	form.Set("user[login]", username)
+	form.Set("user[password]", password)
+
+	req, err := http.NewRequest("POST", signInURL, strings.NewReader(form.Encode()))
+	if err != nil {
+		return "", err
+	}
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	json.NewDecoder(resp.Body).Decode(&signInResponse)
+	return signInResponse.User.AuthToken, err
 }
 
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {

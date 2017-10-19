@@ -22,3 +22,7 @@ type User struct {
 	ForumID      int      `json:"forumId"`
 	RememberMe   bool     `json:"rememberMe"`
 }
+
+type SignInResponse struct {
+	User User `json:"user"`
+}

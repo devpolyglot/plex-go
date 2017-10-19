@@ -10,8 +10,8 @@ type User struct {
 	AuthToken    string `json:"authToken"`
 	Subscription struct {
 		Active   bool     `json:"active"`
-		Status   string   `json:"Active"`
-		Plan     string   `json:"lifetime"`
+		Status   string   `json:"status"`
+		Plan     string   `json:"plan"`
 		Features []string `json:"features"`
 	} `json:"subscription"`
 	Roles struct {

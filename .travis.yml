@@ -5,8 +5,15 @@ go:
   - 1.8.x
   - 1.7.x
   - master
+env:
+  secure: "cgbmW6VOjYZQinIExohcd8adXZ7tYa1WqhUGi6aMqKzTJp3EWTJabn5M1e8qo+zjVaxnXXjEOlqpJsWxKri+e0DY6rh92orQqLCZHoJpxSidPvnTkvvLoYbxIxHHM4WqDusrIqqyR0HHpcBP9ZF3WXn9wEld5OXHAv22BOYBCPmXU0mwxofuoVZRSFP16ocw2gp9aaJEacb+pbxl0TYYCYV3nVhP/ahGSuB1iqD/RcjDXLSgi4OpuldZlg2nYMXuw6jGpOrVPjP7BFgW1d2cGzmcK2cwwxENUmeNkzs8Bqk7QmIQoC18IbCVdF1sRuPTOtBZ3LwxptHtb3tZVie7bbEru8co15peCpY/VeePoOoJRymsox22K7g1ki87WjKn8UfkLmQkVwc2G6uJqo/iPoY6Ohs2D+5/ORPx8gSugc14M7absn7WP9Ib2p8PHV7X0dJM3DSM+f3dFBvdkaRwCGfTri7uGBkx/qd1P8CIsYqK/QvnoI1YqJnM3/CDFZbnshk4Vx79f7928SJ+u+3Ib0DVTWmgJTgHjwvne1n/TCEhSTu/QLmc3pyxaaXeDRwbvYDttaROi0VWrpUW/FeeKQIl5SsaymN+STQRDxli9G/ulvVH2pCytJ+Kw1Ux4unQ6zjuxYqdf/yyFIdBOxiW1IeFoUEOR0Nd3t3HApSTQG0=" # COVERALLS_TOKEN
+install:
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
 script:
   - go get -t -v ./...
   - diff -u <(echo -n) <(gofmt -d -s .)
   - go tool vet .
   - go test -v -race ./...
+  - go test -v -covermode=count -coverprofile=coverage.out ./plex
+  - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN

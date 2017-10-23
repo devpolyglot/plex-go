@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/Lorac/plex-go/model"
 )
 
 const (
@@ -41,7 +39,7 @@ func NewClient(httpClient *http.Client) *Client {
 }
 
 func RequestPlexToken(username, password string, httpClient *http.Client) (string, error) {
-	var signInResponse model.SignInResponse
+	var signInResponse SignInResponse
 
 	form := url.Values{}
 	form.Set("user[login]", username)

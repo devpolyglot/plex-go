@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -22,6 +23,10 @@ const (
 type Client struct {
 	client  *http.Client // HTTP client used to communicate with the API.
 	BaseURL *url.URL
+
+	common service // Reuse a single struct instead of allocating one for each service on the heap.
+
+	Library *LibraryService
 }
 
 type service struct {
@@ -35,6 +40,8 @@ func NewClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 
 	c := &Client{client: httpClient, BaseURL: baseURL}
+	c.common.client = c
+	c.Library = (*LibraryService)(&c.common)
 	return c
 }
 
@@ -81,9 +88,39 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		return nil, err
 	}
 
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 
 	return req, nil
+}
+
+// Do sends an API request and returns the API response. The API response is
+// XML decoded and stored in the value pointed to by v, or returned as an
+// error if an API error has occurred.
+func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
+	resp, err := c.client.Do(req)
+
+	if err != nil {
+		// If the error type is *url.Error, sanitize its URL before returning.
+		if e, ok := err.(*url.Error); ok {
+			if _, err := url.Parse(e.URL); err == nil {
+				return nil, e
+			}
+		}
+		return nil, err
+	}
+
+	defer func() {
+		// Drain up to 512 bytes and close the body to let the Transport reuse the connection
+		io.CopyN(ioutil.Discard, resp.Body, 512)
+		resp.Body.Close()
+	}()
+
+	if v != nil {
+		err = json.NewDecoder(resp.Body).Decode(v)
+		if err == io.EOF {
+			err = nil // ignore EOF errors caused by empty response body
+		}
+	}
+	return resp, err
 }

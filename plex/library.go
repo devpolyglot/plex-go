@@ -36,7 +36,7 @@ type LibraryLabels struct {
 	} `json:"children"`
 }
 
-func (l *LibraryService) GetSections() (*LibrarySections, *http.Response, error) {
+func (l *LibraryService) ListSections() (*LibrarySections, *http.Response, error) {
 	req, err := l.client.NewRequest("GET", "library/sections", nil)
 	if err != nil {
 		return nil, nil, err
@@ -52,7 +52,7 @@ func (l *LibraryService) GetSections() (*LibrarySections, *http.Response, error)
 	return librarySections, resp, nil
 }
 
-func (l *LibraryService) GetLabels(sectionKey string) (*LibraryLabels, *http.Response, error) {
+func (l *LibraryService) ListLabels(sectionKey string) (*LibraryLabels, *http.Response, error) {
 	u := fmt.Sprintf("library/sections/%s/labels", sectionKey)
 	req, err := l.client.NewRequest("GET", u, nil)
 	if err != nil {

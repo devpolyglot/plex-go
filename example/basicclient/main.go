@@ -29,5 +29,5 @@ func main() {
 	tp.XPlexToken = token
 
 	client := plex.NewClient(tp.Client())
-	//client.NewRequest("POST", "", nil)
+	client.NewRequest("POST", "", nil)
 }

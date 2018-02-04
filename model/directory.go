@@ -1,7 +1,6 @@
 package model
 
 type Directory struct {
-	Location   []Location `json:"location,omitempty"`
 	Agent      string     `json:"agen,omitempty"`
 	AllowSync  bool       `json:"allowSync,omitempty"`
 	Art        string     `json:"art,omitempty"`
@@ -10,6 +9,7 @@ type Directory struct {
 	Filter     bool       `json:"filters,omitempty"`
 	Key        string     `json:"key,omitempty"`
 	Language   string     `json:"language,omitempty"`
+	Location   []Location `json:"location,omitempty"`
 	Refreshing bool       `json:"refreshing,omitempty"`
 	Scanner    string     `json:"scanner,omitempty"`
 	Thumb      string     `json:"thumb,omitempty"`

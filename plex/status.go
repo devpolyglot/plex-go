@@ -1,8 +1,10 @@
 package plex
 
-import "encoding/xml"
+import (
+	"net/http"
+)
 
-type SessionsService service
+type StatusService service
 
 // TranscodeSessionsResponse is the result for transcode session endpoint /transcode/sessions
 type TranscodeSessionsResponse struct {
@@ -34,7 +36,7 @@ type CurrentSessionsVideo struct {
 	Art                   string `json:"art" xml:"art,attr"`
 	ChapterSource         string `json:"chapterSource" xml:"chapterSource,attr"`
 	ContentRating         string `json:"contentRating" xml:"contentRating,attr"`
-	Duration              int    `json:"duration" xml:"duration,attr"`
+	Duration              string `json:"duration" xml:"duration,attr"`
 	GUID                  string `json:"guid" xml:"guid,attr"`
 	Key                   string `json:"key" xml:"key,attr"`
 	LibrarySectionID      string `json:"librarySectionID" xml:"librarySectionID,attr"`
@@ -51,9 +53,9 @@ type CurrentSessionsVideo struct {
 	TitleSort             string `json:"titleSort" xml:"titleSort,attr"`
 	Type                  string `json:"type" xml:"type,attr"`
 	UpdatedAt             string `json:"updatedAt" xml:"updatedAt,attr"`
-	ViewOffset            int    `json:"viewOffset" xml:"viewOffset,attr"`
+	ViewOffset            string `json:"viewOffset" xml:"viewOffset,attr"`
 	Year                  string `json:"year" xml:"year,attr"`
-	Media                 struct {
+	Media                 []struct {
 		AspectRatio           string `json:"aspectRatio" xml:"aspectRatio,attr"`
 		AudioChannels         string `json:"audioChannels" xml:"audioChannels,attr"`
 		AudioCodec            string `json:"audioCodec" xml:"audioCodec,attr"`
@@ -70,7 +72,7 @@ type CurrentSessionsVideo struct {
 		VideoProfile          string `json:"videoProfile" xml:"videoProfile,attr"`
 		VideoResolution       string `json:"videoResolution" xml:"videoResolution,attr"`
 		Width                 string `json:"width" xml:"width,attr"`
-		Part                  struct {
+		Part                  []struct {
 			AudioProfile          string `json:"audioProfile" xml:"audioProfile,attr"`
 			Container             string `json:"container" xml:"container,attr"`
 			Duration              string `json:"duration" xml:"duration,attr"`
@@ -129,7 +131,7 @@ type CurrentSessionsVideo struct {
 		Tag   string `json:"tag" xml:"tag,attr"`
 		Count string `json:"count" xml:"count,attr"`
 	} `json:"Writer" xml:"Writer"`
-	Director struct {
+	Director []struct {
 		Count string `json:"count" xml:"count,attr"`
 		ID    string `json:"id" xml:"id,attr"`
 		Tag   string `json:"tag" xml:"tag,attr"`
@@ -139,7 +141,7 @@ type CurrentSessionsVideo struct {
 		ID    string `json:"id" xml:"id,attr"`
 		Tag   string `json:"tag" xml:"tag,attr"`
 	} `json:"Producer" xml:"Producer"`
-	Country struct {
+	Country []struct {
 		Count string `json:"count" xml:"count,attr"`
 		ID    string `json:"id" xml:"id,attr"`
 		Tag   string `json:"tag" xml:"tag,attr"`
@@ -150,6 +152,12 @@ type CurrentSessionsVideo struct {
 		Role  string `json:"role" xml:"role,attr"`
 		Tag   string `json:"tag" xml:"tag,attr"`
 	} `json:"Role" xml:"Role"`
+	Similar []struct {
+		Count  string `json:"count"`
+		Filter string `json:"filter"`
+		ID     string `json:"id"`
+		Tag    string `json:"tag"`
+	} `json:"Similar"`
 	Collection struct {
 		Count string `json:"count" xml:"count,attr"`
 		ID    string `json:"id" xml:"id,attr"`
@@ -164,7 +172,7 @@ type CurrentSessionsVideo struct {
 		Name   string `json:"name" xml:"name,attr"`
 	} `json:"Field" xml:"Field"`
 	User struct {
-		ID    int    `json:"id" xml:"id,attr"`
+		ID    string `json:"id" xml:"id,attr"`
 		Title string `json:"title" xml:"title,attr"`
 		Thumb string `json:"thumb" xml:"thumb,attr"`
 	} `json:"User" xml:"User"`
@@ -197,7 +205,7 @@ type CurrentSessionsVideo struct {
 	ViewCount            string `json:"viewCount" xml:"viewCount,attr"`
 	Session              struct {
 		ID        string `json:"id" xml:"id,attr"`
-		Bandwidth string `json:"bandwidth" xml:"bandwidth,attr"`
+		Bandwidth int    `json:"bandwidth" xml:"bandwidth,attr"`
 		Location  string `json:"location" xml:"location,attr"`
 	} `json:"Session" xml:"Session"`
 	TranscodeSession struct {
@@ -222,103 +230,166 @@ type CurrentSessionsVideo struct {
 
 // CurrentSessions is xml because plex returns a dynamic type (string or number) for the duration field
 type CurrentSessions struct {
-	XMLName xml.Name               `xml:"MediaContainer"`
-	Size    string                 `xml:"size,attr"`
-	Video   []CurrentSessionsVideo `xml:"Video"`
-	Track   []struct {
-		AddedAt              string `xml:"addedAt,attr"`
-		Art                  string `xml:"art,attr"`
-		ChapterSource        string `xml:"chapterSource,attr"`
-		Duration             int    `xml:"duration,attr"`
-		GrandparentArt       string `xml:"grandparentArt,attr"`
-		GrandparentKey       string `xml:"grandparentKey,attr"`
-		GrandparentRatingKey string `xml:"grandparentRatingKey,attr"`
-		GrandparentThumb     string `xml:"grandparentThumb,attr"`
-		GrandparentTitle     string `xml:"grandparentTitle,attr"`
-		GUID                 string `xml:"guid,attr"`
-		Index                string `xml:"index,attr"`
-		Key                  string `xml:"key,attr"`
-		LastViewedAt         string `xml:"lastViewedAt,attr"`
-		LibrarySectionID     string `xml:"librarySectionID,attr"`
-		ParentIndex          string `xml:"parentIndex,attr"`
-		ParentKey            string `xml:"parentKey,attr"`
-		ParentRatingKey      string `xml:"parentRatingKey,attr"`
-		ParentTitle          string `xml:"parentTitle,attr"`
-		RatingKey            string `xml:"ratingKey,attr"`
-		SessionKey           string `xml:"sessionKey,attr"`
-		Summary              string `xml:"summary,attr"`
-		Tagline              string `xml:"tagline,attr"`
-		Thumb                string `xml:"thumb,attr"`
-		Title                string `xml:"title,attr"`
-		Type                 string `xml:"type,attr"`
-		UpdatedAt            string `xml:"updatedAt,attr"`
-		ViewCount            int    `xml:"viewCount,attr"`
-		ViewOffset           int    `xml:"viewOffset,attr"`
-		Media                struct {
-			AudioChannels string `xml:"audioChannels,attr"`
-			AudioCodec    string `xml:"audioCodec,attr"`
-			Bitrate       string `xml:"bitrate,attr"`
-			Container     string `xml:"container,attr"`
-			Duration      string `xml:"duration,attr"`
-			ID            string `xml:"id,attr"`
-			Part          struct {
-				Container string `xml:"container,attr"`
-				Duration  string `xml:"duration,attr"`
-				File      string `xml:"file,attr"`
-				ID        string `xml:"id,attr"`
-				Key       string `xml:"key,attr"`
-				Size      string `xml:"size,attr"`
-				Stream    []struct {
-					AudioChannelLayout string `xml:"audioChannelLayout,attr"`
-					Bitrate            string `xml:"bitrate,attr"`
-					BitrateMode        string `xml:"bitrateMode,attr"`
-					Channels           string `xml:"channels,attr"`
-					Codec              string `xml:"codec,attr"`
-					Duration           string `xml:"duration,attr"`
-					ID                 string `xml:"id,attr"`
-					Index              string `xml:"index,attr"`
-					SamplingRate       string `xml:"samplingRate,attr"`
-					Selected           string `xml:"selected,attr"`
-					StreamType         string `xml:"streamType,attr"`
-				} `xml:"Stream"`
-			} `xml:"Part"`
-		} `xml:"Media"`
-		User struct {
-			ID    int    `xml:"id,attr"`
-			Title string `xml:"title,attr"`
-			Thumb string `xml:"thumb,attr"`
-		} `xml:"User"`
-		Player struct {
-			Address           string `xml:"address,attr"`
-			Device            string `xml:"device,attr"`
-			MachineIdentifier string `xml:"machineIdentifier,attr"`
-			Model             string `xml:"model,attr"`
-			Platform          string `xml:"platform,attr"`
-			PlatformVersion   string `xml:"platformVersion,attr"`
-			Product           string `xml:"product,attr"`
-			Profile           string `xml:"profile,attr"`
-			State             string `xml:"state,attr"`
-			Title             string `xml:"title,attr"`
-			Vendor            string `xml:"vendor,attr"`
-			Version           string `xml:"version,attr"`
-		} `xml:"Player"`
-		TranscodeSession struct {
-			Key           string `xml:"key,attr"`
-			Throttled     string `xml:"throttled,attr"`
-			Progress      string `xml:"progress,attr"`
-			Speed         string `xml:"speed,attr"`
-			Duration      string `xml:"duration,attr"`
-			Remaining     string `xml:"remaining,attr"`
-			Context       string `xml:"context,attr"`
-			VideoDecision string `xml:"videoDecision,attr"`
-			AudioDecision string `xml:"audioDecision,attr"`
-			Protocol      string `xml:"protocol,attr"`
-			Container     string `xml:"container,attr"`
-			VideoCodec    string `xml:"videoCodec,attr"`
-			AudioCodec    string `xml:"audioCodec,attr"`
-			AudioChannels string `xml:"audioChannels,attr"`
-			Width         string `xml:"width,attr"`
-			Height        string `xml:"height,attr"`
-		} `xml:"TranscodeSession"`
-	} `xml:"Track"`
+	MediaContainer struct {
+		Size  int                     `json:"size" xml:"size,attr"`
+		Video []*CurrentSessionsVideo `json:"Video" xml:"Video"`
+		Track []struct {
+			AddedAt              string `xml:"addedAt,attr"`
+			Art                  string `xml:"art,attr"`
+			ChapterSource        string `xml:"chapterSource,attr"`
+			Duration             string `xml:"duration,attr"`
+			GrandparentArt       string `xml:"grandparentArt,attr"`
+			GrandparentKey       string `xml:"grandparentKey,attr"`
+			GrandparentRatingKey string `xml:"grandparentRatingKey,attr"`
+			GrandparentThumb     string `xml:"grandparentThumb,attr"`
+			GrandparentTitle     string `xml:"grandparentTitle,attr"`
+			GUID                 string `xml:"guid,attr"`
+			Index                string `xml:"index,attr"`
+			Key                  string `xml:"key,attr"`
+			LastViewedAt         string `xml:"lastViewedAt,attr"`
+			LibrarySectionID     string `xml:"librarySectionID,attr"`
+			ParentIndex          string `xml:"parentIndex,attr"`
+			ParentKey            string `xml:"parentKey,attr"`
+			ParentRatingKey      string `xml:"parentRatingKey,attr"`
+			ParentTitle          string `xml:"parentTitle,attr"`
+			RatingKey            string `xml:"ratingKey,attr"`
+			SessionKey           string `xml:"sessionKey,attr"`
+			Summary              string `xml:"summary,attr"`
+			Tagline              string `xml:"tagline,attr"`
+			Thumb                string `xml:"thumb,attr"`
+			Title                string `xml:"title,attr"`
+			Type                 string `xml:"type,attr"`
+			UpdatedAt            string `xml:"updatedAt,attr"`
+			ViewCount            int    `xml:"viewCount,attr"`
+			ViewOffset           int    `xml:"viewOffset,attr"`
+			Media                struct {
+				AudioChannels string `xml:"audioChannels,attr"`
+				AudioCodec    string `xml:"audioCodec,attr"`
+				Bitrate       string `xml:"bitrate,attr"`
+				Container     string `xml:"container,attr"`
+				Duration      string `xml:"duration,attr"`
+				ID            string `xml:"id,attr"`
+				Part          struct {
+					Container string `xml:"container,attr"`
+					Duration  string `xml:"duration,attr"`
+					File      string `xml:"file,attr"`
+					ID        string `xml:"id,attr"`
+					Key       string `xml:"key,attr"`
+					Size      string `xml:"size,attr"`
+					Stream    []struct {
+						AudioChannelLayout string `xml:"audioChannelLayout,attr"`
+						Bitrate            string `xml:"bitrate,attr"`
+						BitrateMode        string `xml:"bitrateMode,attr"`
+						Channels           string `xml:"channels,attr"`
+						Codec              string `xml:"codec,attr"`
+						Duration           string `xml:"duration,attr"`
+						ID                 string `xml:"id,attr"`
+						Index              string `xml:"index,attr"`
+						SamplingRate       string `xml:"samplingRate,attr"`
+						Selected           string `xml:"selected,attr"`
+						StreamType         string `xml:"streamType,attr"`
+					} `xml:"Stream"`
+				} `xml:"Part"`
+			} `xml:"Media"`
+			User struct {
+				ID    int    `xml:"id,attr"`
+				Title string `xml:"title,attr"`
+				Thumb string `xml:"thumb,attr"`
+			} `xml:"User"`
+			Player struct {
+				Address           string `xml:"address,attr"`
+				Device            string `xml:"device,attr"`
+				MachineIdentifier string `xml:"machineIdentifier,attr"`
+				Model             string `xml:"model,attr"`
+				Platform          string `xml:"platform,attr"`
+				PlatformVersion   string `xml:"platformVersion,attr"`
+				Product           string `xml:"product,attr"`
+				Profile           string `xml:"profile,attr"`
+				State             string `xml:"state,attr"`
+				Title             string `xml:"title,attr"`
+				Vendor            string `xml:"vendor,attr"`
+				Version           string `xml:"version,attr"`
+			} `xml:"Player"`
+			TranscodeSession struct {
+				Key           string `xml:"key,attr"`
+				Throttled     string `xml:"throttled,attr"`
+				Progress      string `xml:"progress,attr"`
+				Speed         string `xml:"speed,attr"`
+				Duration      string `xml:"duration,attr"`
+				Remaining     string `xml:"remaining,attr"`
+				Context       string `xml:"context,attr"`
+				VideoDecision string `xml:"videoDecision,attr"`
+				AudioDecision string `xml:"audioDecision,attr"`
+				Protocol      string `xml:"protocol,attr"`
+				Container     string `xml:"container,attr"`
+				VideoCodec    string `xml:"videoCodec,attr"`
+				AudioCodec    string `xml:"audioCodec,attr"`
+				AudioChannels string `xml:"audioChannels,attr"`
+				Width         string `xml:"width,attr"`
+				Height        string `xml:"height,attr"`
+			} `xml:"TranscodeSession"`
+		} `json:"Track" xml:"Track,omitempty"`
+	} `json:"MediaContainer,omitempty"`
+}
+
+type History struct {
+	MediaContainer struct {
+		Size     int             `json:"size,omitempty"`
+		Video    []*HistoricView `json:"Video,omitempty"`
+		Playlist []*HistoricView `json:"Playlist,omitempty"`
+		Track    []*HistoricView `json:"Track,omitempty"`
+	}
+}
+
+type HistoricView struct {
+	Key              string `json:"key,omitempty"`
+	ParentKey        string `json:"parentKey,omitempty"`
+	GrandparentKey   string `json:"grandparentKey,omitempty"`
+	Title            string `json:"title,omitempty"`
+	GrandparentTitle string `json:"grandparentTitle,omitempty"`
+	Type             string `json:"type,omitempty"`
+	Thumb            string `json:"thumb,omitempty"`
+	ParentThumb      string `json:"parentThumb,omitempty"`
+	GrandparentThumb string `json:"grandparentThumb,omitempty"`
+	GrandparentArt   string `json:"grandparentArt,omitempty"`
+	Index            int    `json:"index,omitempty"`
+	ParentIndex      int    `json:"parentIndex,omitempty"`
+	ViewedAt         int    `json:"viewedAt,omitempty"`
+	User             struct {
+		ID    string `json:"id,omitempty"`
+		Thumb string `json:"thumb,omitempty"`
+		Title string `json:"title,omitempty"`
+	} `json:"User,omitempty"`
+}
+
+func (s *StatusService) ListCurrentSessions() (*CurrentSessions, *http.Response, error) {
+	req, err := s.client.NewRequest("GET", "status/sessions", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	currentSessions := new(CurrentSessions)
+	resp, err := s.client.Do(req, &currentSessions)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return currentSessions, resp, nil
+}
+
+func (s *StatusService) ListAllHistoryViews() (*History, *http.Response, error) {
+	req, err := s.client.NewRequest("GET", "status/sessions/history/all", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	history := new(History)
+	resp, err := s.client.Do(req, &history)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return history, resp, nil
 }

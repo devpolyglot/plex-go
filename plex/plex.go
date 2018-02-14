@@ -34,17 +34,21 @@ type service struct {
 	client *Client
 }
 
-func NewClient(httpClient *http.Client) *Client {
+func NewClient(httpClient *http.Client, serverAddr string) (*Client, error) {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	baseURL, _ := url.Parse(defaultBaseURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL}
+	baseEndpoint, err := url.Parse(serverAddr)
+	if err != nil {
+		return nil, err
+	}
+
+	c := &Client{client: httpClient, BaseURL: baseEndpoint}
 	c.common.client = c
 	c.Library = (*LibraryService)(&c.common)
 	c.Status = (*StatusService)(&c.common)
-	return c
+	return c, nil
 }
 
 func RequestPlexToken(username, password string, httpClient *http.Client) (string, error) {

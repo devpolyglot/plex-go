@@ -27,7 +27,5 @@ func main() {
 	}
 
 	tp.XPlexToken = token
-
-	client := plex.NewClient(tp.Client())
-	client.NewRequest("POST", "", nil)
+	plex.NewClient(tp.Client(), "http:/127.0.0.1:32400/")
 }

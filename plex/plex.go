@@ -26,7 +26,9 @@ type Client struct {
 
 	common service // Reuse a single struct instead of allocating one for each service on the heap.
 
+	Channel *ChannelService
 	Library *LibraryService
+	Server  *ServerService
 	Status  *StatusService
 }
 
@@ -46,7 +48,9 @@ func NewClient(httpClient *http.Client, serverAddr string) (*Client, error) {
 
 	c := &Client{client: httpClient, BaseURL: baseEndpoint}
 	c.common.client = c
+	c.Channel = (*ChannelService)(&c.common)
 	c.Library = (*LibraryService)(&c.common)
+	c.Server = (*ServerService)(&c.common)
 	c.Status = (*StatusService)(&c.common)
 	return c, nil
 }

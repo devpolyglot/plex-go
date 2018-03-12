@@ -328,38 +328,38 @@ type CurrentSessions struct {
 				Width         string `xml:"width,attr"`
 				Height        string `xml:"height,attr"`
 			} `xml:"TranscodeSession"`
-		} `json:"Track" xml:"Track,omitempty"`
-	} `json:"MediaContainer,omitempty"`
+		} `json:"Track" xml:"Track"`
+	} `json:"MediaContainer"`
 }
 
 type History struct {
 	MediaContainer struct {
-		Size     int             `json:"size,omitempty"`
-		Video    []*HistoricView `json:"Video,omitempty"`
-		Playlist []*HistoricView `json:"Playlist,omitempty"`
-		Track    []*HistoricView `json:"Track,omitempty"`
+		Size     int             `json:"size"`
+		Video    []*HistoricView `json:"Video"`
+		Playlist []*HistoricView `json:"Playlist"`
+		Track    []*HistoricView `json:"Track"`
 	}
 }
 
 type HistoricView struct {
-	Key              string `json:"key,omitempty"`
-	ParentKey        string `json:"parentKey,omitempty"`
-	GrandparentKey   string `json:"grandparentKey,omitempty"`
-	Title            string `json:"title,omitempty"`
-	GrandparentTitle string `json:"grandparentTitle,omitempty"`
-	Type             string `json:"type,omitempty"`
-	Thumb            string `json:"thumb,omitempty"`
-	ParentThumb      string `json:"parentThumb,omitempty"`
-	GrandparentThumb string `json:"grandparentThumb,omitempty"`
-	GrandparentArt   string `json:"grandparentArt,omitempty"`
-	Index            int    `json:"index,omitempty"`
-	ParentIndex      int    `json:"parentIndex,omitempty"`
-	ViewedAt         int    `json:"viewedAt,omitempty"`
+	Key              string `json:"key"`
+	ParentKey        string `json:"parentKey"`
+	GrandparentKey   string `json:"grandparentKey"`
+	Title            string `json:"title"`
+	GrandparentTitle string `json:"grandparentTitle"`
+	Type             string `json:"type"`
+	Thumb            string `json:"thumb"`
+	ParentThumb      string `json:"parentThumb"`
+	GrandparentThumb string `json:"grandparentThumb"`
+	GrandparentArt   string `json:"grandparentArt"`
+	Index            int    `json:"index"`
+	ParentIndex      int    `json:"parentIndex"`
+	ViewedAt         int    `json:"viewedAt"`
 	User             struct {
-		ID    string `json:"id,omitempty"`
-		Thumb string `json:"thumb,omitempty"`
-		Title string `json:"title,omitempty"`
-	} `json:"User,omitempty"`
+		ID    string `json:"id"`
+		Thumb string `json:"thumb"`
+		Title string `json:"title"`
+	} `json:"User"`
 }
 
 func (s *StatusService) ListCurrentSessions() (*CurrentSessions, *http.Response, error) {

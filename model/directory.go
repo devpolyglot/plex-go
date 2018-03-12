@@ -1,20 +1,21 @@
 package model
 
 type Directory struct {
-	Agent      string     `json:"agen,omitempty"`
-	AllowSync  bool       `json:"allowSync,omitempty"`
-	Art        string     `json:"art,omitempty"`
-	Composite  string     `json:"composite,omitempty"`
-	CreatedAt  int        `json:"createdAt,omitempty"`
-	Filter     bool       `json:"filters,omitempty"`
-	Key        string     `json:"key,omitempty"`
-	Language   string     `json:"language,omitempty"`
-	Location   []Location `json:"location,omitempty"`
-	Refreshing bool       `json:"refreshing,omitempty"`
-	Scanner    string     `json:"scanner,omitempty"`
-	Thumb      string     `json:"thumb,omitempty"`
-	Title      string     `json:"title,omitempty"`
-	Type       string     `json:"type,omitempty"`
-	UpdatedAt  int        `json:"updatedAt,omitempty"`
-	UUID       string     `json:"uuid,omitempty"`
+	Agent      string      `json:"agent" xml:"agent,attr"`
+	AllowSync  bool        `json:"allowSync" xml:"allowSync,attr"`
+	Art        string      `json:"art" xml:"art,attr"`
+	Composite  string      `json:"composite" xml:"composite,attr"`
+	CreatedAt  int         `json:"createdAt" xml:"createdAt,attr"`
+	Filter     bool        `json:"filters" xml:"filters,attr"`
+	Key        string      `json:"key" xml:"key,attr"`
+	Language   string      `json:"language" xml:"language,attr"`
+	Location   *[]Location `json:"location" xml:"location,attr"`
+	Name       string      `json:"name" xml:"name,attr"`
+	Refreshing bool        `json:"refreshing" xml:"refreshing,attr"`
+	Scanner    string      `json:"scanner" xml:"scanner,attr"`
+	Thumb      string      `json:"thumb" xml:"thumb,attr"`
+	Title      string      `json:"title" xml:"title,attr"`
+	Type       string      `json:"type" xml:"type,attr"`
+	UpdatedAt  int         `json:"updatedAt" xml:"updatedAt,attr"`
+	UUID       string      `json:"uuid" xml:"uuid,attr"`
 }
